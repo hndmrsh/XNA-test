@@ -26,9 +26,17 @@ namespace XNA_test.Source
 
         Rectangle screenRectangle;
 
+        int bricksWide = 10;
+        int bricksHigh = 5;
+        Texture2D brickTexture;
+        Brick[,] bricks;
+
         public Game1() : base(){
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            graphics.PreferredBackBufferWidth = 750;
+            graphics.PreferredBackBufferHeight = 600;
 
             screenRectangle = new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
         }
@@ -61,6 +69,8 @@ namespace XNA_test.Source
             tempTexture = Content.Load<Texture2D>("ball");
             ball = new Ball(tempTexture, screenRectangle);
 
+            brickTexture = Content.Load<Texture2D>("brick");
+
             StartGame();
         }
 
@@ -68,6 +78,41 @@ namespace XNA_test.Source
         {
             paddle.SetInStartPosition();
             ball.SetInStartPosition(paddle.GetBounds());
+
+            // set up bricks
+            bricks = new Brick[bricksWide, bricksHigh];
+
+            for (int y = 0; y < bricksHigh; y++)
+            {
+                Color tint = Color.White;
+
+                switch (y % bricksHigh)
+                {
+                    case 0:
+                        tint = Color.Blue;
+                        break;
+                    case 1:
+                        tint = Color.Red;
+                        break;
+                    case 2:
+                        tint = Color.Green;
+                        break;
+                    case 3:
+                        tint = Color.Yellow;
+                        break;
+                    case 4:
+                        tint = Color.Purple;
+                        break;
+                }
+
+                for (int x = 0; x < bricksWide; x++)
+                {
+                    Rectangle location = new Rectangle(x * brickTexture.Width, y * brickTexture.Height,
+                        brickTexture.Width, brickTexture.Height);
+
+                    bricks[x, y] = new Brick(brickTexture, location, tint);
+                }
+            }
         }
 
         /// <summary>
@@ -113,7 +158,12 @@ namespace XNA_test.Source
 
             paddle.Draw(spriteBatch);
             ball.Draw(spriteBatch);
-
+            
+            foreach (Brick b in bricks)
+            {
+                b.Draw(spriteBatch);
+            }
+            
             spriteBatch.End();
             base.Draw(gameTime);
         }
