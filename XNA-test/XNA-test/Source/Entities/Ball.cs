@@ -12,20 +12,40 @@ namespace XNA_test.Source.Entities
 
         Vector2 motion;
         Vector2 position;
-        float speed = 4f;
+        Rectangle bounds;
+
+        float speed;
+        const float startSpeed = 4f;
 
         Texture2D texture;
         Rectangle screenBounds;
+
+        bool collided;
+
+        public Rectangle Bounds
+        {
+            get
+            {
+                bounds.X = (int) position.X;
+                bounds.Y = (int) position.Y;
+                return bounds;
+            }
+        }
 
         public Ball(Texture2D texture, Rectangle screenBounds)
         {
             this.texture = texture;
             this.screenBounds = screenBounds;
+
+            bounds = new Rectangle(0, 0, texture.Width, texture.Height);
         }
 
         public void Update()
         {
+            collided = false;
             position += motion * speed;
+            speed += 0.01f;
+
             CheckWallCollision();
         }
 
@@ -50,7 +70,12 @@ namespace XNA_test.Source.Entities
 
         public void SetInStartPosition(Rectangle paddleLocation)
         {
-            motion = new Vector2(1, -1);
+            Random r = new Random();
+            motion = new Vector2(r.Next(2, 6), -r.Next(2, 6));
+            motion.Normalize();
+
+            speed = startSpeed;
+
             position.Y = paddleLocation.Y - texture.Height;
             position.X = paddleLocation.X + ((paddleLocation.Width - texture.Width) / 2);
         }
@@ -76,9 +101,20 @@ namespace XNA_test.Source.Entities
             sprites.Draw(texture, position, Color.White);
         }
 
+        public void Deflect(Brick brick)
+        {
+            if (!collided)
+            {
+                motion.Y *= -1;
 
+                /*
+                 * TODO: cleverer collision detection here (intersecting line segments
+                 * of the ball's movement between frames and each edge of the brick's
+                 * bounding box)
+                 */
 
-
-
+                collided = true;
+            }
+        }
     }
 }

@@ -138,6 +138,9 @@ namespace XNA_test.Source
             ball.Update();
 
             ball.PaddleCollision(paddle.GetBounds());
+            foreach(Brick brick in bricks){
+                brick.CheckCollision(ball);
+            }
 
             if (ball.OffBottom())
             {
